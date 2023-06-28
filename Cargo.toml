@@ -1,0 +1,33 @@
+[package]
+name = "lnpl"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "lnpl"
+doctest = false
+bench = false
+
+[[bin]]
+name = "main"
+test = false
+bench = false
+
+# FIXME: Delete this binary crate
+[[bin]]
+name = "stats"
+test = false
+bench = false
+
+[[bin]]
+name = "perfhash"
+test = false
+bench = false
+
+[[bench]]
+name = "lexer"
+test = false
+
+[dependencies]
+logos = "0.13.0"
+
