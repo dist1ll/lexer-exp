@@ -48,9 +48,9 @@ pub enum TokenKind {
     /// }
     BraceClose = 125,
     // ----------------
-    Whitespace = 0b11000000,
-    Number = 0b10100000,
-    Ident = 0b10000000,
+    Whitespace = 0xfd,
+    Number = 0xfe,
+    Ident = 0xff,
 }
 
 impl TokenKind {

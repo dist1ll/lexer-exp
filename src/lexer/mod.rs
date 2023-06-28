@@ -6,8 +6,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 mod aarch64;
-pub mod generic;
 pub mod common;
+pub mod generic;
 
 #[cfg(not(target_arch = "aarch64"))]
 pub use generic::Lexer;
@@ -17,20 +17,33 @@ pub use aarch64::Lexer;
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use super::common::TokenKind;
+    use super::Lexer;
+    use super::super::experimental::Token;
+    const SOURCE: &'static str = include_str!("../../src/example.ln");
 
     #[test]
-    pub fn peek() {
-        let mut t = Lexer::new("+ +");
-        // peek, peek, next
-        assert_eq!(t.peek_token().unwrap().kind, TokenKind::Plus);
-        assert_eq!(t.peek_token().unwrap().kind, TokenKind::Plus);
-        assert_eq!(t.next_token().unwrap().kind, TokenKind::Plus);
-
-        // peek, peek, next
-        assert_eq!(t.peek_token().unwrap().kind, TokenKind::Whitespace);
-        assert_eq!(t.peek_token().unwrap().kind, TokenKind::Whitespace);
-        assert_eq!(t.next_token().unwrap().kind, TokenKind::Whitespace);
+    fn asm() {
+        println!("testing assembly");
+        let mut y = Lexer::new(SOURCE);
+        y.asm_exp();
+    }
+    #[test]
+    fn parity() {
+        let mut x = <Token as logos::Logos>::lexer(SOURCE);
+        let mut y = Lexer::new(SOURCE);
+        for i in 0..10000 {
+            let xn = x.next().unwrap();
+            if xn.is_err() {
+                panic!("{:?}", xn);
+            }
+            let logos = xn.unwrap();
+            let lnpl = y.next_token().unwrap();
+            eprintln!(
+                "Token #{i} logos: {: <8} lnpl: {: <8}",
+                std::str::from_utf8(x.slice().as_bytes()).unwrap(),
+                std::str::from_utf8(y.slice()).unwrap()
+            );
+            assert_eq!(logos, lnpl.kind.into(), "{i}");
+        }
     }
 }

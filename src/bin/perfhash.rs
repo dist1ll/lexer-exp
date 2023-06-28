@@ -34,7 +34,7 @@ fn main() {
 
     let mut map = BTreeSet::<u8>::new();
     for i in 1..1000 {
-        let mut indices = vec![];
+        let mut indices = Vec::with_capacity(16);
         for b in keywords.iter() {
             let mut hash = 0usize;
             hash += b[0] as usize + i;

@@ -53,7 +53,7 @@ fn main() {
 
 #[derive(Default)]
 struct Histogram {
-    values: [usize; 8],
+    values: [usize; 30],
 }
 
 fn get_histograms(f: &DirEntry) -> BTreeMap<TokenKind, Histogram> {
@@ -62,6 +62,7 @@ fn get_histograms(f: &DirEntry) -> BTreeMap<TokenKind, Histogram> {
     res.insert(TokenKind::Ident, Default::default());
     res.insert(TokenKind::Number, Default::default());
     res.insert(TokenKind::Whitespace, Default::default());
+    res.insert(TokenKind::Eq, Default::default());
 
     let buf = std::fs::read_to_string(f.path()).unwrap();
     let mut lexer = lnpl::lexer::Lexer::new(buf.as_str());
@@ -74,7 +75,7 @@ fn get_histograms(f: &DirEntry) -> BTreeMap<TokenKind, Histogram> {
             t @ (Whitespace | Number) => {
                 res.get_mut(&t).unwrap().values[lexer.slice().len()] += 1;
             }
-            _ => continue,
+            _ => res.get_mut(&TokenKind::Eq).unwrap().values[0] += 1,
         }
     }
     println!("buffer length: {}", buf.len());

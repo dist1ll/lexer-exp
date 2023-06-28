@@ -16,16 +16,17 @@ use test::Bencher;
 
 extern crate test;
 
-const SOURCE: &'static str = include_str!("../src/example.ln");
+#[repr(align(4096))]
+struct SourceWrapper(&'static str);
+const SOURCE: SourceWrapper = SourceWrapper(include_str!("../src/example.ln"));
 
 #[bench]
 fn lnpl_version(b: &mut Bencher) {
-    assert_impl_parity();
+    // assert_impl_parity();
 
     b.iter(|| {
-        // let mut i = 0;
-        let mut x = Lexer::new(SOURCE);
-        while let Some(_) = x.next_token() {}
+        let mut x = Lexer::new(SOURCE.0);
+        while let Some(_) = x.next_token() { }
         // while let Some(t) = x.next_token() {
         //     println!("{i} {:?}", t.kind);
         //     i += 1;
@@ -37,9 +38,9 @@ fn lnpl_version(b: &mut Bencher) {
     })
 }
 fn assert_impl_parity() {
-    let mut x = lnpl::experimental::Token::lexer(SOURCE);
-    let mut y = Lexer::new(SOURCE);
-    for i in 0..10000 {
+    let mut x = lnpl::experimental::Token::lexer(SOURCE.0);
+    let mut y = Lexer::new(SOURCE.0);
+    for i in 0..20000 {
         let xn = x.next().unwrap();
         if xn.is_err() {
             panic!("{:?}", xn);
@@ -56,9 +57,19 @@ fn assert_impl_parity() {
 }
 #[bench]
 fn logos_version(b: &mut Bencher) {
+    use lnpl::experimental;
+    use logos::Logos;
     b.iter(|| {
-        let mut x = lnpl::experimental::Token::lexer(SOURCE);
-        while let Some(_) = x.next() {}
+        let mut x = experimental::Token::lexer(SOURCE.0);
+        #[allow(unused)]
+        #[inline(never)]
+        fn non_inlined_next(
+            l: &mut logos::Lexer<experimental::Token>,
+        ) -> Option<Result<experimental::Token, ()>> {
+            l.next()
+        }
+        // while let Some(_) = non_inlined_next(&mut x) {}
+        while let Some(_) = x.next() { }
         black_box(x);
     })
 }
