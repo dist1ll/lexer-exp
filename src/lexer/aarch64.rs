@@ -21,7 +21,7 @@ const SIMD_MAP_USCORE: u8 = 0x5f;
 /// Size of the SIMD buffer in bytes. We process a large chunk of bytes of the
 /// input string at a time, which is then read by the [next_token] function.
 /// After reaching the end of such a chunk, we process the next chunk.
-pub const SIMD_BUFFER_SIZE: u16 = 1024;
+pub const SIMD_BUFFER_SIZE: u16 = 512;
 
 #[repr(align(128))]
 pub struct SimdBuffer([u8; SIMD_BUFFER_SIZE as usize]);
@@ -154,20 +154,17 @@ impl<'a> Lexer<'a> {
         self.pos += SIMD_BUFFER_SIZE as u32;
     }
 
-    #[no_mangle]
     #[inline(never)]
     pub fn asm_exp(&mut self) -> u32 {
         Self::print_register(24);
         13
     }
 
-    #[no_mangle]
     #[inline(never)]
     fn print_register(x: u32) {
         println!("{x}");
     }
 
-    #[no_mangle]
     #[inline(always)]
     pub fn next_token(&mut self) -> Option<Token> {
         self.current_len = 1;
